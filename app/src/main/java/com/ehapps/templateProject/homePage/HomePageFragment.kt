@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import com.ehapps.core.domain.DomainResource
 import com.ehapps.core.domain.model.ShowCharacter
+import com.ehapps.core.setGone
+import com.ehapps.core.setVisible
 import com.ehapps.core.ui.BaseFragment
 import com.ehapps.core.ui.adapter.MultiTypeAdapter
 import com.ehapps.core.ui.adapter.MultiTypeCollection
@@ -38,12 +40,16 @@ class HomePageFragment : BaseFragment() {
 
     override fun onLoading(resource: DomainResource<Any>) {
         super.onLoading(resource)
+        when (HomePageViewModel.Actions.values()[resource.actionCode]) {
+            HomePageViewModel.Actions.CHARACTERS -> binding.progressBar.setVisible()
+        }
     }
 
     override fun onOperationSuccess(resource: DomainResource<Any>) {
         super.onOperationSuccess(resource)
         when (HomePageViewModel.Actions.values()[resource.actionCode]) {
             HomePageViewModel.Actions.CHARACTERS -> {
+                binding.progressBar.setGone()
                 adapter.setCollection(resource.data as MultiTypeCollection)
                 binding.charactersList.adapter = adapter
             }

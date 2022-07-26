@@ -9,6 +9,7 @@ import com.ehapps.core.ui.adapter.MultiTypeCollection
 import com.ehapps.templateProject.adapter.delegate.CharacterDelegate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class HomePageViewModel(private val charactersUseCase: CharactersUseCase) : ViewModel() {
@@ -17,8 +18,9 @@ class HomePageViewModel(private val charactersUseCase: CharactersUseCase) : View
         MutableStateFlow<DomainResource<Any>>(DomainResource.Loading(actionCode = Actions.CHARACTERS.ordinal))
 
     init {
+        charactersStateFlow.value = DomainResource.Loading(actionCode = Actions.CHARACTERS.ordinal)
         viewModelScope.launch {
-            charactersUseCase.getAllCharacters().collect {
+            charactersUseCase.getAllCharacters().collectLatest {
                 charactersStateFlow.value = it.data?.let { characters ->
                     val dataCollection = MultiTypeCollection.Builder()
                         .add(characters, CharacterDelegate())
