@@ -41,6 +41,7 @@ captures/
 
 # IntelliJ
 *.iml
+.idea/
 .idea/workspace.xml
 .idea/tasks.xml
 .idea/gradle.xml
@@ -90,8 +91,4 @@ lint/reports/
 # Android Profiling
 *.hprof
 
-.DS_Store
-.idea/gradle.xml
-.idea/misc.xml
-.idea/misc.xml
 .DS_Store
