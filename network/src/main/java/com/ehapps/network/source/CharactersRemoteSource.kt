@@ -10,11 +10,11 @@ import kotlinx.coroutines.flow.flowOn
 
 class CharactersRemoteSource(private val charactersService: CharactersService) {
 
-    fun getAllCharacters(): Flow<ApiResponse<CharactersResponse>> {
+    fun getAllCharacters(page: Int = 1): Flow<ApiResponse<CharactersResponse>> {
         return flow {
             emit(
                 //TODO move the conversion to retrofit converter
-                charactersService.getAllCharacters().let {
+                charactersService.getAllCharacters(page).let {
                     if (it == null) {
                         ApiResponse.Empty
                     } else {

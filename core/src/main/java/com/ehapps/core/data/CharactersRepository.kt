@@ -1,6 +1,7 @@
 package com.ehapps.core.data
 
 import com.ehapps.cache.source.CharactersLocalSource
+import com.ehapps.core.domain.model.ShowCharacter
 import com.ehapps.core.domain.repository.ICharactersRepository
 import com.ehapps.core.utils.CharactersDataMapper
 import com.ehapps.network.ApiResponse
@@ -16,32 +17,31 @@ class CharactersRepository(
     private val charactersLocalSource: CharactersLocalSource
 ) : ICharactersRepository {
 
-    override fun getAllCharacters(): Flow<Resource<List<com.ehapps.core.domain.model.ShowCharacter>>> =
-        object :
-            NetworkBoundResource<List<com.ehapps.core.domain.model.ShowCharacter>, CharactersResponse>() {
-            override fun loadFromDB(): Flow<List<com.ehapps.core.domain.model.ShowCharacter>> {
-                return charactersLocalSource.getAllCharacters().map {
-                    CharactersDataMapper.mapEntitiesToDomain(it)
-                }
+    override fun getAllCharacters(page: Int): Flow<Resource<List<ShowCharacter>>> = object :
+        NetworkBoundResource<List<ShowCharacter>, CharactersResponse>() {
+        override fun loadFromDB(): Flow<List<ShowCharacter>> {
+            return charactersLocalSource.getAllCharacters().map {
+                CharactersDataMapper.mapEntitiesToDomain(it)
             }
+        }
 
-            override fun shouldFetch(data: List<com.ehapps.core.domain.model.ShowCharacter>?): Boolean {
-                return data == null || data.isEmpty()
+        override fun shouldFetch(data: List<ShowCharacter>?): Boolean {
+            return true
+        }
+
+        override suspend fun createCall(): Flow<ApiResponse<CharactersResponse>> {
+            return charactersRemoteSource.getAllCharacters(page)
+        }
+
+        override suspend fun saveCallResult(data: CharactersResponse) {
+            withContext(Dispatchers.Default) {
+                charactersLocalSource.insertAllCharacters(
+                    CharactersDataMapper.mapResponseToEntity(data)
+                )
             }
+        }
 
-            override suspend fun createCall(): Flow<ApiResponse<CharactersResponse>> {
-                return charactersRemoteSource.getAllCharacters()
-            }
-
-            override suspend fun saveCallResult(data: CharactersResponse) {
-                withContext(Dispatchers.Default) {
-                    charactersLocalSource.insertAllCharacters(
-                        CharactersDataMapper.mapResponseToEntity(data)
-                    )
-                }
-            }
-
-        }.asFlow()
+    }.asFlow()
 
     companion object {
         const val TAG = "CharactersRepository"

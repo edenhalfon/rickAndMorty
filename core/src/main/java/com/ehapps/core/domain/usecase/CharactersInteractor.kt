@@ -6,7 +6,7 @@ import com.ehapps.core.domain.repository.ICharactersRepository
 import kotlinx.coroutines.flow.Flow
 
 class CharactersInteractor(private val charactersRepository: ICharactersRepository): CharactersUseCase {
-    override fun getAllCharacters(): Flow<Resource<List<ShowCharacter>>> {
-        return charactersRepository.getAllCharacters()
+    override fun getAllCharacters(page: Int): Flow<Resource<List<ShowCharacter>>> {
+        return charactersRepository.getAllCharacters(page)
     }
 }

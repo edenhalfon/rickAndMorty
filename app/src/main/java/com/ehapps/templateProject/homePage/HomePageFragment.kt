@@ -5,15 +5,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.ehapps.core.domain.DomainResource
-import com.ehapps.core.domain.model.ShowCharacter
 import com.ehapps.core.setGone
 import com.ehapps.core.setVisible
 import com.ehapps.core.ui.BaseFragment
 import com.ehapps.core.ui.adapter.MultiTypeAdapter
 import com.ehapps.core.ui.adapter.MultiTypeCollection
-import com.ehapps.templateProject.adapter.delegate.CharacterDelegate
 import com.ehapps.templateProject.databinding.HomePageFragmentBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -36,6 +34,8 @@ class HomePageFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         collectFlow(homePageViewModel.charactersStateFlow)
+
+        binding.charactersList.adapter = adapter
     }
 
     override fun onLoading(resource: DomainResource<Any>) {
@@ -51,7 +51,16 @@ class HomePageFragment : BaseFragment() {
             HomePageViewModel.Actions.CHARACTERS -> {
                 binding.progressBar.setGone()
                 adapter.setCollection(resource.data as MultiTypeCollection)
-                binding.charactersList.adapter = adapter
+
+                binding.charactersList.setOnScrollChangeListener { recyclerView, i, i2, i3, i4 ->
+                    val layoutManager = binding.charactersList.layoutManager as LinearLayoutManager
+                    val lastVisible = layoutManager.findLastCompletelyVisibleItemPosition()
+                    if (adapter.itemCount - 7 <= lastVisible) {
+                        Log.d(TAG, "loading more items")
+                        binding.charactersList.setOnScrollChangeListener(null)
+                        homePageViewModel.loadMoreCharacters()
+                    }
+                }
             }
         }
     }

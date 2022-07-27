@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface ICharactersRepository {
 
-    fun getAllCharacters(): Flow<Resource<List<ShowCharacter>>>
+    fun getAllCharacters(page: Int = 1): Flow<Resource<List<ShowCharacter>>>
 }

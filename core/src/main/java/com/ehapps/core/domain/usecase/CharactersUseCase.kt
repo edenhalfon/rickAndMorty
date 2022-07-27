@@ -5,5 +5,5 @@ import com.ehapps.core.domain.model.ShowCharacter
 import kotlinx.coroutines.flow.Flow
 
 interface CharactersUseCase {
-    fun getAllCharacters(): Flow<Resource<List<ShowCharacter>>>
+    fun getAllCharacters(page: Int = 1): Flow<Resource<List<ShowCharacter>>>
 }
